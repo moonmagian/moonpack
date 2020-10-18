@@ -32,7 +32,7 @@ int binary_huffman_pack(FILE *in, FILE *out) {
             huffman_nodes[node_count] = malloc(sizeof(bin_huffman_node_t));
             huffman_nodes[node_count]->c = (unsigned char)i;
             huffman_nodes[node_count]->p = cnt[i];
-            huffman_nodes[node_count]->type = NODE_CHAR;
+            huffman_nodes[node_count]->type = NODE_CHAR_BIN;
             huffman_nodes[node_count]->left = NULL;
             huffman_nodes[node_count]->right = NULL;
 
@@ -45,7 +45,7 @@ int binary_huffman_pack(FILE *in, FILE *out) {
         bin_huffman_node_t *node1 = huffman_nodes[--node_count];
         bin_huffman_node_t *node2 = huffman_nodes[--node_count];
         bin_huffman_node_t *reduced_node = malloc(sizeof(bin_huffman_node_t));
-        reduced_node->type = NODE_REDUCED;
+        reduced_node->type = NODE_REDUCED_BIN;
         reduced_node->left = node1;
         reduced_node->right = node2;
         reduced_node->p = node1->p + node2->p;
@@ -144,7 +144,7 @@ void binary_huffman_tree_walk(bin_huffman_node_t *const root,
                               bin_huffman_char_t out[256]) {
     if (root == NULL)
         return;
-    if (root->type == NODE_CHAR) {
+    if (root->type == NODE_CHAR_BIN) {
         out[root->c] = code;
     } else {
         u64_lshift1(code.bits, 4);
@@ -225,7 +225,7 @@ int binary_huffman_unpack(FILE *in, FILE *out) {
                 return -1;
             }
             // decode it.
-            if (position->type == NODE_CHAR) {
+            if (position->type == NODE_CHAR_BIN) {
                 fwrite(&position->c, sizeof(unsigned char), 1, out);
                 ++decoded_byte_count;
                 position = root;
@@ -255,7 +255,7 @@ void binary_huffman_tree_build(bin_huffman_node_t *const root,
             root->c = dict[i].byte;
             root->left = NULL;
             root->right = NULL;
-            root->type = NODE_CHAR;
+            root->type = NODE_CHAR_BIN;
             return;
         }
     }
@@ -269,7 +269,7 @@ void binary_huffman_tree_build(bin_huffman_node_t *const root,
 
     root->left = malloc(sizeof(bin_huffman_node_t));
     root->right = malloc(sizeof(bin_huffman_node_t));
-    root->type = NODE_REDUCED;
+    root->type = NODE_REDUCED_BIN;
     binary_huffman_tree_build(root->left, left_code, dict, n);
     binary_huffman_tree_build(root->right, right_code, dict, n);
 }

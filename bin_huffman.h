@@ -1,8 +1,8 @@
-#ifndef COMPRESS_STEP_H
-#define COMPRESS_STEP_H
+#ifndef BIN_HUFFMAN_H
+#define BIN_HUFFMAN_H
 #include <stdlib.h>
 #include <stdio.h>
-enum type { NODE_REDUCED, NODE_CHAR };
+enum bhuffman_type { NODE_REDUCED_BIN, NODE_CHAR_BIN };
 typedef struct bin_huffman_node {
     int type;
     unsigned char c;
