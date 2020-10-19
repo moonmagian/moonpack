@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "tools.h"
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT
 int ternary_node_cmp(const void *node_1, const void *node_2) {
     tern_huffman_node_t *const *node_1_ptr = node_1;
     tern_huffman_node_t *const *node_2_ptr = node_2;

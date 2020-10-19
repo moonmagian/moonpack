@@ -82,6 +82,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Unable to open outfile.\n");
         return 1;
     }
+    int result = 0;
     if (op == PACK) {
         switch (opmode) {
         case BIN:
@@ -97,13 +98,29 @@ int main(int argc, char **argv) {
     } else {
         switch (opmode) {
         case BIN:
-            binary_huffman_unpack(infile, outfile);
+            result = binary_huffman_unpack(infile, outfile);
             break;
         case TERN:
-            ternary_huffman_unpack(infile, outfile);
+            result = ternary_huffman_unpack(infile, outfile);
             break;
         case QUIN:
-            quinary_huffman_unpack(infile, outfile);
+            result = quinary_huffman_unpack(infile, outfile);
+            break;
+        }
+    }
+    if (result == -1) {
+        switch (opmode) {
+        case BIN:
+            fprintf(stderr,
+                    "Not a valid moonpack binary huffman compressed file.\n");
+            break;
+        case TERN:
+            fprintf(stderr,
+                    "Not a valid moonpack ternary huffman compressed file.\n");
+            break;
+        case QUIN:
+            fprintf(stderr,
+                    "Not a valid moonpack quirnary huffman compressed file.\n");
             break;
         }
     }
