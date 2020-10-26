@@ -1,8 +1,8 @@
 #include "tools.h"
 
-void u64_lshift1(u_int64_t *in, size_t n) {
+void u64_lshift1(uint64_t *in, uint64_t n) {
     int carry = 0;
-    for (size_t i = 0; i != n; ++i) {
+    for (uint64_t i = 0; i != n; ++i) {
         in[i] <<= 1;
         if (carry) {
             in[i] |= 0x01U;

@@ -17,7 +17,7 @@ int node_cmp(const void *node_1, const void *node_2) {
 }
 
 int binary_huffman_pack(FILE *in, FILE *out) {
-    size_t cnt[256] = {0};
+    uint64_t cnt[256] = {0};
     unsigned char value;
     while (fread(&value, sizeof(value), 1, in) == sizeof(value)) {
         ++cnt[value];
@@ -26,7 +26,7 @@ int binary_huffman_pack(FILE *in, FILE *out) {
     rewind(in);
 
     bin_huffman_node_t *huffman_nodes[256] = {0};
-    size_t node_count = 0;
+    uint64_t node_count = 0;
     for (int i = 0; i != 256; ++i) {
         if (cnt[i]) {
             huffman_nodes[node_count] = malloc(sizeof(bin_huffman_node_t));
@@ -65,9 +65,9 @@ int binary_huffman_pack(FILE *in, FILE *out) {
             for (int j = (int)dict[i].bit_length - 1; j >= 0; --j) {
                 printf(
                     "%c",
-                    dict[i].bits[(unsigned int)j / (8U * sizeof(u_int64_t))] &
+                    dict[i].bits[(unsigned int)j / (8U * sizeof(uint64_t))] &
                             (0x01U
-                             << ((unsigned int)j % (8U * sizeof(u_int64_t))))
+                             << ((unsigned int)j % (8U * sizeof(uint64_t))))
                         ? '1'
                         : '0');
             }
@@ -76,7 +76,7 @@ int binary_huffman_pack(FILE *in, FILE *out) {
     }
 #endif
 
-    size_t dict_count = 0;
+    uint64_t dict_count = 0;
     bin_huffman_head_dict_t head_dict[256];
     for (unsigned int i = 0; i != 256; ++i) {
         if (dict[i].bit_length != 0) {
@@ -89,7 +89,7 @@ int binary_huffman_pack(FILE *in, FILE *out) {
     // Write magic head.
     fwrite(&bin_huffman_head_magic, sizeof(bin_huffman_head_magic), 1, out);
     bin_huffman_head_t head = {
-        .data_size = (size_t)fsize, .dict_count = dict_count, .reserved = {0}};
+        .data_size = (uint64_t)fsize, .dict_count = dict_count, .reserved = {0}};
     // Write head.
     fwrite(&head, sizeof(head), 1, out);
     // Write dict.
@@ -104,8 +104,8 @@ int binary_huffman_pack(FILE *in, FILE *out) {
         int len = (int)dict[value].bit_length;
         for (int j = len - 1; j >= 0; --j) {
             unsigned int bit =
-                dict[value].bits[(unsigned int)j / (8U * sizeof(u_int64_t))] &
-                (0x01U << ((unsigned int)j % (8U * sizeof(u_int64_t))));
+                dict[value].bits[(unsigned int)j / (8U * sizeof(uint64_t))] &
+                (0x01U << ((unsigned int)j % (8U * sizeof(uint64_t))));
             byte = set_bit(byte, bit_count, bit);
             ++bit_count;
 
@@ -158,9 +158,9 @@ void binary_huffman_tree_walk(bin_huffman_node_t *const root,
     }
 }
 
-int binary_huffman_get_data_size(FILE *in, size_t *out) {
-    u_int32_t magic;
-    fread(&magic, sizeof(u_int32_t), 1, in);
+int binary_huffman_get_data_size(FILE *in, uint64_t *out) {
+    uint32_t magic;
+    fread(&magic, sizeof(uint32_t), 1, in);
     if (magic != bin_huffman_head_magic) {
         return -1;
     }
@@ -173,8 +173,8 @@ int binary_huffman_get_data_size(FILE *in, size_t *out) {
 
 int binary_huffman_unpack(FILE *in, FILE *out) {
 
-    u_int32_t magic;
-    fread(&magic, sizeof(u_int32_t), 1, in);
+    uint32_t magic;
+    fread(&magic, sizeof(uint32_t), 1, in);
     if (magic != bin_huffman_head_magic) {
         return -1;
     }
@@ -197,9 +197,9 @@ int binary_huffman_unpack(FILE *in, FILE *out) {
             printf("restored code for: 0x%x (%c): ", i, i);
             for (int j = (int)debug_dict[i].bit_length - 1; j >= 0; --j) {
                 printf("%c", debug_dict[i].bits[(unsigned int)j /
-                                                (8U * sizeof(u_int64_t))] &
+                                                (8U * sizeof(uint64_t))] &
                                      (0x01U << ((unsigned int)j %
-                                                (8U * sizeof(u_int64_t))))
+                                                (8U * sizeof(uint64_t))))
                                  ? '1'
                                  : '0');
             }
@@ -207,7 +207,7 @@ int binary_huffman_unpack(FILE *in, FILE *out) {
         }
     }
 #endif
-    size_t decoded_byte_count = 0;
+    uint64_t decoded_byte_count = 0;
     unsigned char byte = 0;
     bin_huffman_node_t *position = root;
     while (decoded_byte_count != head.data_size) {
@@ -244,8 +244,8 @@ END_LOOP:
 
 void binary_huffman_tree_build(bin_huffman_node_t *const root,
                                bin_huffman_char_t code,
-                               bin_huffman_head_dict_t *dict, size_t n) {
-    for (size_t i = 0; i != n; ++i) {
+                               bin_huffman_head_dict_t *dict, uint64_t n) {
+    for (uint64_t i = 0; i != n; ++i) {
         if (code.bit_length == dict[i].code.bit_length &&
             code.bits[0] == dict[i].code.bits[0] &&
             code.bits[1] == dict[i].code.bits[1] &&

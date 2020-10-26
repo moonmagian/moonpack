@@ -17,7 +17,7 @@ int ternary_node_cmp(const void *node_1, const void *node_2) {
 }
 
 int ternary_huffman_pack(FILE *in, FILE *out) {
-    size_t cnt[256] = {0};
+    uint64_t cnt[256] = {0};
     unsigned char value;
     while (fread(&value, sizeof(value), 1, in) == sizeof(value)) {
         ++cnt[value];
@@ -29,7 +29,7 @@ int ternary_huffman_pack(FILE *in, FILE *out) {
     // If there will be 256 nodes,
     // a dummy node should be added.
     tern_huffman_node_t *huffman_nodes[257] = {0};
-    size_t node_count = 0;
+    uint64_t node_count = 0;
     for (int i = 0; i != 256; ++i) {
         if (cnt[i]) {
             huffman_nodes[node_count] = malloc(sizeof(tern_huffman_node_t));
@@ -97,7 +97,7 @@ int ternary_huffman_pack(FILE *in, FILE *out) {
     }
 #endif
 
-    size_t dict_count = 0;
+    uint64_t dict_count = 0;
     tern_huffman_head_dict_t head_dict[256];
     for (unsigned int i = 0; i != 256; ++i) {
         if (dict[i].bit_length != 0) {
@@ -109,7 +109,7 @@ int ternary_huffman_pack(FILE *in, FILE *out) {
 
     // Write magic head.
     fwrite(&tern_huffman_head_magic, sizeof(tern_huffman_head_magic), 1, out);
-    tern_huffman_head_t head = {.data_size = (size_t)fsize,
+    tern_huffman_head_t head = {.data_size = (uint64_t)fsize,
                                 .dict_count = dict_count,
                                 .has_dummy = has_dummy,
                                 .reserved = {0}};
@@ -197,9 +197,9 @@ void ternary_huffman_tree_walk(tern_huffman_node_t *const root,
     }
 }
 
-int ternary_huffman_get_data_size(FILE *in, size_t *out) {
-    u_int32_t magic;
-    fread(&magic, sizeof(u_int32_t), 1, in);
+int ternary_huffman_get_data_size(FILE *in, uint64_t *out) {
+    uint32_t magic;
+    fread(&magic, sizeof(uint32_t), 1, in);
     if (magic != tern_huffman_head_magic) {
         return -1;
     }
@@ -212,8 +212,8 @@ int ternary_huffman_get_data_size(FILE *in, size_t *out) {
 
 int ternary_huffman_unpack(FILE *in, FILE *out) {
 
-    u_int32_t magic;
-    fread(&magic, sizeof(u_int32_t), 1, in);
+    uint32_t magic;
+    fread(&magic, sizeof(uint32_t), 1, in);
     if (magic != tern_huffman_head_magic) {
         return -1;
     }
@@ -223,7 +223,7 @@ int ternary_huffman_unpack(FILE *in, FILE *out) {
         malloc(sizeof(tern_huffman_head_dict_t) * head.dict_count);
     fread(dict, sizeof(tern_huffman_head_dict_t), head.dict_count, in);
 #ifdef DEBUG_OUTPUT
-    for (size_t i = 0; i != head.dict_count; ++i) {
+    for (uint64_t i = 0; i != head.dict_count; ++i) {
             printf("in-file code for: 0x%x (%c): ", dict[i].byte, dict[i].byte);
             for (int j = (int)dict[i].code.bit_length - 1; j >= 0; --j) {
                 printf("%d", dict[i].code.tbits[j].bit);
@@ -258,7 +258,7 @@ int ternary_huffman_unpack(FILE *in, FILE *out) {
         }
     }
 #endif
-    size_t decoded_byte_count = 0;
+    uint64_t decoded_byte_count = 0;
     unsigned char byte = 0;
     tern_huffman_node_t *position = root;
     while (decoded_byte_count != head.data_size) {
@@ -298,13 +298,13 @@ END_LOOP:
 
 void ternary_huffman_tree_build(tern_huffman_node_t *const root,
                                 tern_huffman_char_t code,
-                                tern_huffman_head_dict_t *dict, size_t n,
+                                tern_huffman_head_dict_t *dict, uint64_t n,
                                 tern_huffman_char_t *dummy) {
 
-    for (size_t i = 0; i != n; ++i) {
+    for (uint64_t i = 0; i != n; ++i) {
         if (code.bit_length == dict[i].code.bit_length) {
-            u_int16_t bc = code.bit_length;
-            u_int16_t j = 0;
+            uint16_t bc = code.bit_length;
+            uint16_t j = 0;
             for (j = 0;
                  j != bc && code.tbits[j].bit == dict[i].code.tbits[j].bit; ++j)
                 ;
@@ -320,8 +320,8 @@ void ternary_huffman_tree_build(tern_huffman_node_t *const root,
         }
     }
     if (dummy != NULL && code.bit_length == dummy->bit_length) {
-        u_int16_t i;
-        u_int16_t bc = dummy->bit_length;
+        uint16_t i;
+        uint16_t bc = dummy->bit_length;
         for (i = 0; i != bc && code.tbits[i].bit == dummy->tbits[i].bit; ++i)
             ;
         if (i == bc) {

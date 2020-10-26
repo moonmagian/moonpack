@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdint.h>
 #include "bin_huffman.h"
 #include "tern_huffman.h"
 #include "quin_huffman.h"
