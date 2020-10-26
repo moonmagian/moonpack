@@ -4,14 +4,14 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        bin_huffman.c \
-        main.c \
-        quin_huffman.c \
-        tern_huffman.c \
-        tools.c
+        src/bin_huffman.c \
+        src/main.c \
+        src/quin_huffman.c \
+        src/tern_huffman.c \
+        src/tools.c
 
 HEADERS += \
-    bin_huffman.h \
-    quin_huffman.h \
-    tern_huffman.h \
-    tools.h
+    src/bin_huffman.h \
+    src/quin_huffman.h \
+    src/tern_huffman.h \
+    src/tools.h
